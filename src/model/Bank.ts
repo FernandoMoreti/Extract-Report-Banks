@@ -1,5 +1,6 @@
 import { Browser, chromium, Page } from 'playwright'
 import { BankConfig, BrowserOptions, LoginSelectors } from '../types/types'
+import { hasReportToday } from '../utils/utils';
 
 export abstract class Bank {
 
@@ -70,7 +71,7 @@ export abstract class Bank {
 
     abstract Login(): Promise<void>;
 
-    abstract Navigate(): Promise<void>
+    abstract Navigate(): Promise<string | void>
 
     abstract Download(): Promise<string>
 
@@ -84,11 +85,22 @@ export abstract class Bank {
         console.log(`\nIniciando Robo: ${this.bankName} `);
 
         try {
+
+            const hasReport = await hasReportToday(this.bankName)
+
+            if (typeof hasReport === 'string') {
+                return hasReport
+            }
+
             console.log(`[${this.bankName}] Logando no site...`);
             await this.Login();
 
             console.log(`[${this.bankName}] Navegando para extrair o relatório...`);
-            await this.Navigate();
+            const navigateData = await this.Navigate();
+
+            if (navigateData) {
+                return navigateData
+            }
 
             console.log(`[${this.bankName}] Iniciando download do relatório...`);
             const filename = await this.Download();

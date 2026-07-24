@@ -1,5 +1,8 @@
 import { C6BankExtractor } from "./model/C6Bank"
 import { GrandinoExtractor } from "./model/Grandino"
+import { JbcredExtractor } from "./model/Jbcred"
+import { NovosaqueExtractor } from "./model/Novosaque"
+import { NovosaqueCartaoExtractor } from "./model/NovosaqueCartao"
 
 export async function ExtractMapper(bank: string) {
 
@@ -12,5 +15,17 @@ export async function ExtractMapper(bank: string) {
             console.log("Iniciando a Extração do Grandino")
             const grandino = new GrandinoExtractor()
             return await grandino.Run()
+        case "Jbcred":
+            console.log("Iniciando a Extração do Jbcred")
+            const jbcred = new JbcredExtractor()
+            return await jbcred.Run()
+        case "Novo Saque":
+            console.log("Iniciando a Extração do Novo Saque")
+            const novosaque = new NovosaqueExtractor()
+            return await novosaque.Run()
+        case "Novo Saque Cartao":
+            console.log("Iniciando a Extração do Novo Saque Cartao")
+            const novosaquecartao = new NovosaqueCartaoExtractor()
+            return await novosaquecartao.Run()
     }
 }

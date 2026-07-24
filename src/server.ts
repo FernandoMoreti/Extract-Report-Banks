@@ -17,7 +17,19 @@ app.post('/api/rpa/', async (req: Request, res: Response) => {
         const filename: string | undefined = await ExtractMapper(bank)
 
         if (!filename) {
-            res.status(404).json({ Status: "Failed", data: "Recebemos undefined quando buscamos o filename" })
+            res.setHeader('x-error-message', encodeURIComponent("Recebemos undefined quando buscamos o filename"));
+            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
+            return res.status(404).send()
+        }
+
+        if (filename == "Hoje não é dia de Buscar relatórios") {
+            res.setHeader('x-error-message', encodeURIComponent(filename));
+            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
+            return res.status(404).send()
+        } else if (filename == "Nenhum registo localizado no banco") {
+            res.setHeader('x-error-message', encodeURIComponent(filename));
+            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
+            return res.status(404).send()
         }
 
         const filePath = path.join('./download', filename!);
