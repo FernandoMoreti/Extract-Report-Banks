@@ -91,9 +91,8 @@ export class NovosaqueCartaoExtractor extends Bank {
             const formattedInitialDate = (formatWithFixedHour(initalDate, true));
             const formattedEndDate = formatWithFixedHour(endDate);
 
-            await this.page?.getByRole('button', { name: ' Saque FGTS' }).click();
-            await this.page?.getByRole('menuitem', { name: 'Esteira FGTS' }).click();
-
+            await this.page?.getByRole('button', { name: ' Contratos Cartão' }).click();
+            await this.page?.getByRole('menuitem', { name: 'Esteira' }).click();
             await this.page?.locator('#filter_date_type').selectOption('commission_payment_date');
 
             await this.page?.locator('#date_init_filter').fill(formattedInitialDate);
@@ -105,9 +104,15 @@ export class NovosaqueCartaoExtractor extends Bank {
 
             await this.page?.waitForTimeout(5000);
 
-            await this.page?.locator('a').filter({ hasText: 'Comissões Pagas' }).click();
+            const semRegistros = this.page?.getByRole('cell').first();
 
-            return
+            if (await semRegistros?.isVisible()) {
+                await this.page?.locator('a').filter({ hasText: 'Comissões Pagas' }).click();
+                return
+            }
+
+            return "Nenhum registo localizado no banco"
+
         } catch (e) {
             console.error("Erro durante o processo de login:", e)
 
