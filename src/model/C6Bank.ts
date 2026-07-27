@@ -156,10 +156,16 @@ export class C6BankExtractor extends Bank {
                     throw new Error("Erro ao realizar o download")
                 }
 
-                const fileName = download.suggestedFilename();
+                let fileName = download.suggestedFilename();
 
-                if (!fileName) {
-                    throw new Error("Erro ao obter o nome do arquivo baixado")
+                if (!fileName || fileName.includes('download') || fileName === 'unknown') {
+                    const fileUrl = download.url();
+                    const urlParams = new URLSearchParams(fileUrl.split('?')[1]);
+                    const rawFilename = urlParams.get('filename');
+
+                    if (rawFilename) {
+                        fileName = decodeURIComponent(rawFilename);
+                    }
                 }
 
                 const downloadPath = path.resolve('./download', fileName)

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "3008:3008"
+    volumes:
+      - ./download:/app/download
+    environment:
+      - NODE_ENV=production
+    shm_size: 2gb

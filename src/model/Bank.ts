@@ -86,11 +86,11 @@ export abstract class Bank {
 
         try {
 
-            const hasReport = await hasReportToday(this.bankName)
+            // const hasReport = await hasReportToday(this.bankName)
 
-            if (typeof hasReport === 'string') {
-                return hasReport
-            }
+            // if (typeof hasReport === 'string') {
+            //     return hasReport
+            // }
 
             console.log(`[${this.bankName}] Logando no site...`);
             await this.Login();

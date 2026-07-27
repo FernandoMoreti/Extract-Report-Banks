@@ -3,7 +3,7 @@ dotenv.config();
 
 export const c6_infos = {
     url: `${process.env.URL_C6_BANK}`,
-    headless: false,
+    headless: true,
     password: `${process.env.PASSWORD_C6_BANK}`,
     username: `${process.env.USERNAME_C6_BANK}`,
     selector: {

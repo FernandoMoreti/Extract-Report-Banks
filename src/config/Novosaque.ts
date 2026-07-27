@@ -3,7 +3,7 @@ dotenv.config();
 
 export const novosaque_infos = {
     url: `${process.env.URL_NOVOSAQUE}`,
-    headless: false,
+    headless: true,
     password: `${process.env.PASSWORD_NOVOSAQUE}`,
     username: `${process.env.USERNAME_NOVOSAQUE}`,
     selector: {
