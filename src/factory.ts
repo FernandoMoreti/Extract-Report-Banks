@@ -1,6 +1,7 @@
 import { C6BankExtractor } from "./model/C6Bank"
 import { GrandinoExtractor } from "./model/Grandino"
 import { JbcredExtractor } from "./model/Jbcred"
+// import { NbcExtractor } from "./model/Nbc"
 import { NovosaqueExtractor } from "./model/Novosaque"
 import { NovosaqueCartaoExtractor } from "./model/NovosaqueCartao"
 
@@ -19,6 +20,10 @@ export async function ExtractMapper(bank: string) {
             console.log("Iniciando a Extração do Jbcred")
             const jbcred = new JbcredExtractor()
             return await jbcred.Run()
+        // case "NBC":
+        //     console.log("Iniciando a Extração do NBC")
+        //     const nbc = new NbcExtractor()
+        //     return await nbc.Run()
         case "Novo Saque":
             console.log("Iniciando a Extração do Novo Saque")
             const novosaque = new NovosaqueExtractor()
