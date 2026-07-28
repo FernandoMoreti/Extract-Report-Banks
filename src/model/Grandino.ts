@@ -97,8 +97,7 @@ export class GrandinoExtractor extends Bank {
 
             const finalDate = yesterday.toLocaleDateString("pt-BR")
 
-            await this.page?.getByRole('link', { name: ' Relatórios' }).click();
-            await this.page?.getByRole('link', { name: ' Relatório de Comissões' }).click();
+            await this.page?.goto('https://corban.grandinobank.com.br/AppConsig/Pages/Relatorios/ICRLCmss');
 
             await this.page?.locator('#ctl00_Cph_cbTipoData_CAMPO').waitFor({state: "visible"});
             await this.page?.locator('#ctl00_Cph_cbTipoData_CAMPO').selectOption('F');
@@ -135,10 +134,26 @@ export class GrandinoExtractor extends Bank {
 
             try {
 
-                const [download] = await Promise.all([
-                    this.page?.waitForEvent('download', { timeout: 30000 }),
-                    this.page?.getByRole('link', { name: ' Gerar Relatório' }).click({ force: true }),
-                ]);
+
+                let download = null;
+
+                try {
+                    const [downloadEvent] = await Promise.all([
+                        this.page?.waitForEvent('download', { timeout: 15000 }),
+                        this.page?.locator('#ctl00_Cph_bbGerarRelatorio').click(),
+                    ]);
+
+                    download = downloadEvent
+                } catch (e) {
+                    const hasPopup = await this.page?.locator('#ctl00_Cph_lblMensagem').isVisible()
+
+                    if (hasPopup) {
+                        return "Nenhum registo localizado no banco"
+                    } else {
+                        console.error(`Erro na tentativa ${attempt}:`, e);
+                        throw new Error("Falha ao realizar o Download")
+                    }
+                }
 
                 if (!download) {
                     console.log("Download não recebido")
