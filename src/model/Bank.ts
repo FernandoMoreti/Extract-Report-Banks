@@ -73,7 +73,7 @@ export abstract class Bank {
 
     abstract Navigate(): Promise<string | void>
 
-    abstract Download(): Promise<string>
+    abstract Download(): Promise<string | void>
 
     async CloseBrowser(): Promise<void> {
         if (this.browser) {

@@ -29,3 +29,19 @@ export function formatWithFixedHour(date: Date, initial: boolean = false): strin
 
   return `${yyyy}-${mm}-${dd}T06:00`;
 }
+
+export async function convertValues(value: string): Promise<boolean> {
+  try {
+    if (value.includes("-")) {
+      return true
+    } else if (value.replace(/\u00A0/g, " ").trim() == "savings R$ 0,00") {
+      return true
+    }
+
+    return false
+  } catch(error) {
+    console.error("Erro ao validar se valor é negativo ou zerado")
+    throw new Error("Erro ao validar valor")
+  }
+
+}

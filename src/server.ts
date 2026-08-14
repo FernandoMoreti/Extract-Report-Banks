@@ -30,6 +30,14 @@ app.post('/api/rpa/', async (req: Request, res: Response) => {
             res.setHeader('x-error-message', encodeURIComponent(filename));
             res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
             return res.status(404).send()
+        } else if (filename == "Nenhum valor zerado ou negativo encontrado") {
+            res.setHeader('x-error-message', encodeURIComponent(filename));
+            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
+            return res.status(404).send()
+        } else if (filename == "Workbank") {
+            res.setHeader('x-filename', encodeURIComponent("Baixa automatica realizada com sucesso!!!"));
+            res.setHeader('Access-Control-Expose-Headers', 'x-filename');
+            return res.status(200).send()
         }
 
         const filePath = path.join('./download', filename!);

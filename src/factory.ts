@@ -4,10 +4,15 @@ import { JbcredExtractor } from "./model/Jbcred"
 // import { NbcExtractor } from "./model/Nbc"
 import { NovosaqueExtractor } from "./model/Novosaque"
 import { NovosaqueCartaoExtractor } from "./model/NovosaqueCartao"
+import { Workbank } from "./model/Workbank"
 
 export async function ExtractMapper(bank: string) {
 
     switch (bank) {
+        case "Baixa Automatica":
+            console.log("Iniciando a baixa automática do Workbank")
+            const workbank = new Workbank()
+            return await workbank.Run()
         case "C6 bank Comissao":
             console.log("Iniciando a Extração do C6 Bank")
             const c6_bank = new C6BankExtractor()
