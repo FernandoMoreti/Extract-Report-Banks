@@ -11,48 +11,58 @@ app.use(cors())
 
 app.post('/api/rpa/', async (req: Request, res: Response) => {
     const { bank } = req.body
-    console.log(`Ativei o RPA do banco: ${bank}`)
+
+    res.setHeader('Content-Type', 'application/x-ndjson');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const sendChunk = (type: 'log' | 'error' | 'success' | 'file', message: string, extra = {}) => {
+        res.write(JSON.stringify({ type, message, ...extra }) + '\n');
+    }
 
     try {
-        const filename: string | undefined = await ExtractMapper(bank)
+        sendChunk('log', `Ativei o RPA do banco: ${bank}`);
+
+        sendChunk('log', `Buscando mapeamento para ${bank}...`);
+
+        const filename: string | undefined = await ExtractMapper(bank, (msg: string) => sendChunk('log', msg))
 
         if (!filename) {
-            res.setHeader('x-error-message', encodeURIComponent("Recebemos undefined quando buscamos o filename"));
-            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
-            return res.status(404).send()
+            sendChunk('error', "Recebemos undefined quando buscamos o filename");
+            return res.end()
         }
 
         if (filename == "Hoje não é dia de Buscar relatórios") {
-            res.setHeader('x-error-message', encodeURIComponent(filename));
-            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
-            return res.status(404).send()
+            sendChunk('error', filename)
+            return res.end()
         } else if (filename == "Nenhum registo localizado no banco") {
-            res.setHeader('x-error-message', encodeURIComponent(filename));
-            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
-            return res.status(404).send()
+            sendChunk('error', filename)
+            return res.end()
         } else if (filename == "Nenhum valor zerado ou negativo encontrado") {
-            res.setHeader('x-error-message', encodeURIComponent(filename));
-            res.setHeader('Access-Control-Expose-Headers', 'x-error-message');
-            return res.status(404).send()
+            sendChunk('error', filename)
+            return res.end()
         } else if (filename == "Workbank") {
-            res.setHeader('x-filename', encodeURIComponent("Baixa automatica realizada com sucesso!!!"));
-            res.setHeader('Access-Control-Expose-Headers', 'x-filename');
-            return res.status(200).send()
+            sendChunk('log', "Baixa automatica realizada com sucesso!!!")
+            return res.end()
         }
+
+        sendChunk('log', `Arquivo encontrado: ${filename}. Preparando download...`);
 
         const filePath = path.join('./download', filename!);
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-        res.setHeader('x-filename', encodeURIComponent(filename!));
-        res.setHeader('Access-Control-Expose-Headers', 'x-filename');
+        const fileBuffer = fs.readFileSync(filePath);
+        const base64File = fileBuffer.toString('base64');
 
-        const fileStream = fs.createReadStream(filePath);
-        fileStream.pipe(res);
-
-        fileStream.on('end', () => {
-            fs.unlink(filePath, (err) => { if (err) console.error(err); });
+        sendChunk('file', 'Arquivo pronto', {
+            fileData: base64File,
+            filename: filename
         });
+
+        fs.unlink(filePath, (err) => {
+            if (err) console.error("Erro ao deletar arquivo temporário:", err); 
+        });
+
+        res.end();
     } catch (error) {
         console.error(error);
         res.status(500).send('Erro interno no servidor.');

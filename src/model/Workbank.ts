@@ -162,8 +162,11 @@ export class Workbank extends Bank {
             while (hasMore) {
 
                 const card = this.page?.getByText('edit_note').first()
+                const cardCount = this.page?.getByText('edit_note')
 
-                const count = await card!.count();
+                const count = await cardCount!.count();
+
+                console.log(`Contagem de cards em confirmação: ${count}`)
 
                 if (count === 0) {
                     console.log("Não há mais itens para processar.");
@@ -208,39 +211,41 @@ export class Workbank extends Bank {
         }
     }
 
-    async Run() {
-        console.log(`\nIniciando Robo: ${this.bankName} `);
+    async Run(logger: (msg: string) => void) {
+        logger(`\nIniciando Robo: ${this.bankName} `);
 
         try {
 
-            console.log(`[${this.bankName}] Logando no site...`);
+            logger(`[${this.bankName}] Logando no site...`);
             await this.Login();
 
-            console.log(`[${this.bankName}] Navegando para extrair o relatório...`);
+            logger(`[${this.bankName}] Navegando para extrair o relatório...`);
             await this.Navigate();
 
-            console.log(`[${this.bankName}] Iniciando procura por valores zerados ou menores que zero...`);
+            logger(`[${this.bankName}] Iniciando procura por valores zerados ou menores que zero...`);
             const hasZero = await this.FindZeroValues();
 
             if (hasZero == "Nenhum valor zerado ou negativo encontrado") {
-                console.log(`[${this.bankName}] Não foram encontrados valores zerados ou negativos. Encerrando processo.`);
+                logger(`[${this.bankName}] Não foram encontrados valores zerados ou negativos. Encerrando processo.`);
                 return "Nenhum valor zerado ou negativo encontrado"
             }
 
+            logger(`[${this.bankName}] Confirmando valores encontrados...`);
             await this.CheckAll()
 
+            logger(`[${this.bankName}] Processando valores...`);
             await this.Download()
 
-            console.log(`[${this.bankName}] Processo finalizado com SUCESSO!`);
+            logger(`[${this.bankName}] Processo finalizado com SUCESSO!`);
 
             return "Workbank"
 
         } catch (error) {
-            console.error(`[${this.bankName}] FALHA CRÍTICA:`, error);
+            logger(`[${this.bankName}] FALHA CRÍTICA: ` + error);
             return "Nenhum valor zerado ou negativo encontrado";
         } finally {
             await this.CloseBrowser();
-            console.log(`Fechando Browser...\n`);
+            logger(`Fechando Browser...\n`);
         }
     }
 }

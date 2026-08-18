@@ -81,8 +81,8 @@ export abstract class Bank {
         }
     }
 
-    public async Run(): Promise<string | undefined> {
-        console.log(`\nIniciando Robo: ${this.bankName} `);
+    public async Run(logger: (msg: string) => void): Promise<string | undefined> {
+        logger(`\nIniciando Robo: ${this.bankName} `);
 
         try {
 
@@ -92,33 +92,33 @@ export abstract class Bank {
                 return hasReport
             }
 
-            console.log(`[${this.bankName}] Logando no site...`);
+            logger(`[${this.bankName}] Logando no site...`);
             await this.Login();
 
-            console.log(`[${this.bankName}] Navegando para extrair o relatório...`);
+            logger(`[${this.bankName}] Navegando para extrair o relatório...`);
             const navigateData = await this.Navigate();
 
             if (navigateData) {
                 return navigateData
             }
 
-            console.log(`[${this.bankName}] Iniciando download do relatório...`);
+            logger(`[${this.bankName}] Iniciando download do relatório...`);
             const filename = await this.Download();
 
             if (!filename) {
                 throw new Error("Nome do arquivo não foi encontrado")
             }
 
-            console.log(`[${this.bankName}] Processo finalizado com SUCESSO!`);
+            logger(`[${this.bankName}] Processo finalizado com SUCESSO!`);
 
             return filename
 
         } catch (error) {
-            console.error(`[${this.bankName}] FALHA CRÍTICA:`, error);
+            logger(`[${this.bankName}] FALHA CRÍTICA: ` + error);
             return undefined;
         } finally {
             await this.CloseBrowser();
-            console.log(`Fechando Browser...\n`);
+            logger(`Fechando Browser...\n`);
         }
     }
 }
